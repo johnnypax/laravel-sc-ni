@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Telemetria Realtime</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; background: #f9f9f9; }
+        .card { display: inline-block; background: white; border-radius: 10px; padding: 20px; margin: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .value { font-size: 2em; font-weight: bold; margin-top: 10px; }
+        #timestamp { margin-top: 30px; color: #555; }
+    </style>
+</head>
+<body>
+<h1>Telemetria in Tempo Reale</h1>
+<div class="card">
+    <h3>Temperatura</h3>
+    <div id="temp" class="value">-- °C</div>
+</div>
+<div class="card">
+    <h3>Umidità</h3>
+    <div id="hum" class="value">-- %</div>
+</div>
+<p id="timestamp"></p>
+
+<script>
+    const socket = new WebSocket("ws://127.0.0.1:8080");
+
+    socket.onopen = () => console.log("Connessione WebSocket aperta");
+    socket.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            document.getElementById('temp').textContent = data.temperature + " °C";
+            document.getElementById('hum').textContent = data.humidity + " %";
+            document.getElementById('timestamp').textContent = "Aggiornato: " + data.timestamp;
+        } catch (e) {
+            console.error("Errore parsing dati:", event.data);
+        }
+    };
+    socket.onclose = () => console.log("Connessione chiusa");
+</script>
+</body>
+</html>
